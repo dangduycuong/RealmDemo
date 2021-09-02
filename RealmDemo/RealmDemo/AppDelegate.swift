@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import RealmSwift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -15,7 +16,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        let mySchemaVersion = 5
+        
+        Realm.Configuration.defaultConfiguration = Realm.Configuration(
+                    schemaVersion: UInt64(mySchemaVersion),
+                    migrationBlock: { (migration, oldSchemaVersion) in
+                        migration.enumerateObjects(ofType: BookItem.className(), {
+                            (oldObject, newObject) in
+                            print("1111ahadjkhajksdhajkshdajksdhajksd")
+                            //copy dta frm old pro to new properties
+//                            newObject?["tensach"] = oldObject?["name"]
+//                            newObject?["xong"] = oldObject?["isDone"]
+//                            newObject?["tacGia"] = oldObject?["author"]
+                            
+//                            migration.renameProperty(onType: BookItem.className(), from: "ten", to: "name")
+//                            migration.renameProperty(onType: BookItem.className(), from: "name", to: "tensach")
+                        })
+                })
+        Realm.Configuration.defaultConfiguration = Realm.Configuration(
+                    schemaVersion: UInt64(mySchemaVersion),
+                    migrationBlock: { (migration, oldSchemaVersion) in
+//                        migration.renameProperty(onType: BookItem.className(), from: "name", to: "tensach")
+//                        migration.renameProperty(onType: BookItem.className(), from: "isDone", to: "xong")
+//                        migration.renameProperty(onType: BookItem.className(), from: "author", to: "tacGia")
+                })
         return true
     }
 

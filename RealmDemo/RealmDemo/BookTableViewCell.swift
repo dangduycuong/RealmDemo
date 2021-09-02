@@ -16,8 +16,8 @@ class BookTableViewCell: UITableViewCell {
     func configureWith(_ book: BookItem, onToggleCompleted: ((BookItem) -> Void)? = nil) {
         self.book = book
         self.onToggleCompleted = onToggleCompleted
-        self.textLabel?.text = book.name
-        self.accessoryType = book.isCompleted ? .checkmark : .none
+        self.textLabel?.text = book.tensach
+        self.accessoryType = book.xong ? .checkmark : .none
     }
     
     func toggleCompleted() {

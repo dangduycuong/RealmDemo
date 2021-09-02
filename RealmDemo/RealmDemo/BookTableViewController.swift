@@ -12,12 +12,54 @@ import RealmSwift
 
 class BookTableViewController: UITableViewController {
     
-    private var books: Results<BookItem>?
+    private var token: NotificationToken?
+    
+    private var books: [BookItem]? {
+        get {
+//            return realm.objects(BookItem.self).sorted(byKeyPath: "name", ascending: true).toArray(ofType: BookItem.self)
+            return realm.objects(BookItem.self).toArray(ofType: BookItem.self)
+        }
+    }
+    
+    private lazy var realm = try! Realm()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        books = BookItem.getAll()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+//        token = BookItem.getAll().observe({ [weak tableView] changes in
+//            guard let tableView = tableView else { return }
+//            switch changes {
+//            case .initial:
+//                tableView.reloadData()
+//            case .update(_, let deletions, let insertions, let updates):
+//                tableView.applyChanges(deletions: deletions, insertions: insertions, updates: updates)
+//            case .error:
+//                break
+//            }
+//        })
+//        let temp: Results<BookItem>?
+//        temp = BookItem.getAll()
+//        token = temp?.observe({ [weak tableView] changes in
+//            guard let tableView = tableView else { return }
+//            switch changes {
+//            case .initial:
+//                tableView.reloadData()
+//            case .update(_, let deletions, let insertions, let updates):
+//                tableView.applyChanges(deletions: deletions, insertions: insertions, updates: updates)
+//            case .error:
+//                break
+//            }
+//        })
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        token?.invalidate()
     }
 
     // MARK: - Table view data source
@@ -50,11 +92,17 @@ class BookTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let cell = tableView.cellForRow(at: indexPath) as? BookTableViewCell else {
-            return
-        }
-        
-        cell.toggleCompleted()
+//        guard let cell = tableView.cellForRow(at: indexPath) as? BookTableViewCell else {
+//            return
+//        }
+//
+//        cell.toggleCompleted()
+        let book = BookItem()
+        book.tensach = "Sua roi"
+        realm.beginWrite()
+        books?[indexPath.row].tensach = book.tensach
+        try! realm.commitWrite()
+        tableView.reloadRows(at: [indexPath], with: .automatic)
     }
     
 
@@ -72,6 +120,7 @@ class BookTableViewController: UITableViewController {
                 return
             }
             callback(text)
+            self.tableView.reloadData()
         })
         
         let root = UIApplication.shared.keyWindow?.rootViewController
@@ -86,33 +135,18 @@ class BookTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        guard let book = books?[indexPath.row],
-            editingStyle == .delete else { return }
-        book.delete()
-        tableView.reloadData()
-    }
-    
-    private var token: NotificationToken?
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        token = books?.observe({ [weak tableView] changes in
-            guard let tableView = tableView else { return }
-            switch changes {
-            case .initial:
+        if editingStyle == .delete, let books = books {
+            try! realm.write {
+                realm.delete(books[indexPath.row])
+                tableView.deleteRows(at: [indexPath], with: .automatic)
                 tableView.reloadData()
-            case .update(_, let deletions, let insertions, let updates):
-                tableView.applyChanges(deletions: deletions, insertions: insertions, updates: updates)
-            case .error: break
             }
-        })
+        }
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        token?.invalidate()
-    }
+    
+    
+    
 }
 
 extension UITableView {

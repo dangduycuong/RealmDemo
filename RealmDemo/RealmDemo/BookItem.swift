@@ -21,8 +21,9 @@ class DataBaseManager: NSObject {
     }
     
     dynamic var id = UUID().uuidString
-    dynamic var name = ""
-    dynamic var isCompleted = false
+    dynamic var tensach = ""
+    dynamic var xong = false
+//    dynamic var tacGia = ""
     
     override static func primaryKey() -> String? {
         return BookItem.Property.id.rawValue
@@ -30,7 +31,7 @@ class DataBaseManager: NSObject {
     
     convenience init(_ name: String) {
         self.init()
-        self.name = name
+        self.tensach = name
     }
     
     //get list book: lấy object trong realm database
@@ -42,7 +43,7 @@ class DataBaseManager: NSObject {
     func toggleCompleted() {
         guard let realm = realm else { return }
         try! realm.write {
-            isCompleted = !isCompleted
+            xong = !xong
         }
         // việc thay đổi propertyisCompleted thực thi trong closure của hàm write(_:)
     }
@@ -59,7 +60,11 @@ class DataBaseManager: NSObject {
 // thêm book
 extension BookItem {
     static func add(name: String, in realm: Realm = try! Realm()) -> BookItem {
-        let book = BookItem(name)
+        let book = BookItem()
+        book.tensach = name
+        book.id = String.random()
+        book.xong = Bool.random()
+//        book.tacGia = "asfdsgdsghdsfhdjklsfhsdfhdjksfh"
         try! realm.write {
             realm.add(book)
         }
